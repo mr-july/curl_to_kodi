@@ -3,6 +3,7 @@ name = "curl-to-kodi"
 version = "0.1.0"
 description = "Convert curl command lines to Kodi .strm files and yt-dlp scripts"
 authors = [{name = "mr-july"}]
+requires-python = ">=3.8"
 dependencies = [
     "pyperclip>=1.8.2"
 ]
@@ -11,7 +12,6 @@ dependencies = [
 curl-to-kodi = "src.curl_to_kodi:main"
 
 [tool.uv]
-python = ">=3.8"
 
 [tool.pytest.ini_options]
 pythonpath = [
