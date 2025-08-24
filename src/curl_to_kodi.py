@@ -1,6 +1,7 @@
 import re
 import sys
 import os
+from urllib.parse import quote
 
 try:
     import pyperclip
@@ -8,12 +9,10 @@ except ImportError:
     pyperclip = None
 
 ALLOWED_HEADERS = {
-    'authorization',
-    'user-agent',
     'cookie',
+    'origin',
     'referer',
-    'accept',
-    'range'
+    'user-agent',
 }
 
 def parse_curl(curl_command):
@@ -35,7 +34,7 @@ def kodi_strm_content(url, headers):
         raise ValueError("No URL found in curl command.")
     if headers:
         header_str = '|'
-        header_str += '&'.join(f"{k}={v}" for k, v in headers.items())
+        header_str += '&'.join(f"{k}={quote(v)}" for k, v in headers.items())
         return f"{url}{header_str}"
     else:
         return url
