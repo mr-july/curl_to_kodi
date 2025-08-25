@@ -1,19 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "curl-to-kodi"
-version = "0.1.0"
-description = "Convert curl command lines to Kodi .strm files and yt-dlp scripts"
-authors = [{name = "mr-july"}]
+version = "0.2.0"
+description = "Convert a curl command into a Kodi .strm entry and an optional yt-dlp script."
+readme = "README.md"
 requires-python = ">=3.8"
-dependencies = [
-    "pyperclip>=1.8.2"
+authors = [{name = "mr-july"}]
+license = {text = "MIT"}
+keywords = ["kodi", "curl", "yt-dlp", "stream", "strm"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
+
+# No hard dependencies. Clipboard support is optional.
+dependencies = []
+
+[project.optional-dependencies]
+clipboard = ["pyperclip>=1.8"]
 
 [project.scripts]
-curl-to-kodi = "src.curl_to_kodi:main"
+curl-to-kodi = "curl_to_kodi.cli:entrypoint"
 
-[tool.uv]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = [
-    "src"
-]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version = "0.1.0"
+version_files = ["pyproject.toml:version"]
+update_changelog_on_bump = true
