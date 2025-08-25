@@ -40,3 +40,8 @@ tag_format = "v$version"
 version = "0.1.0"
 version_files = ["pyproject.toml:version"]
 update_changelog_on_bump = true
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.31.0",
+]
