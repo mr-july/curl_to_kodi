@@ -1,78 +1,69 @@
 # curl-to-kodi
 
-Convert `curl` command lines (with headers) to Kodi `.strm` files and yt-dlp shell scripts.
+Convert a `curl` command into a Kodi `.strm` entry and optionally generate a `yt-dlp` script with the same headers.
 
 ## Features
 
-- Parse curl command to extract URL and allowed headers.
-- Generate Kodi `.strm` files compatible with custom headers.
-- Generate a ready-to-run `yt-dlp` shell script, preserving allowed headers and using your specified stream title for output.
-- Can read curl command directly from your clipboard.
-- Command-line options for custom output names and stream titles.
+- Parses `-H/--header` (quoted or unquoted) and extracts the URL (quoted or unquoted).
+- Whitelists common headers required by Kodi/yt-dlp (`cookie`, `origin`, `referer`, `user-agent`) with an option to include all headers.
+- Generates `.strm` files where headers are appended as `|k=v&k2=v2` with URL-encoding for values.
+- Optionally creates a platform-appropriate script for `yt-dlp` (`.sh` on Unix, `.bat` on Windows, `.ps1` for PowerShell).
+- Clipboard input supported if `pyperclip` is installed.
+- Helpful flags: `--dry-run`, `--all-headers`, `--script-format {sh,bat,ps1}`.
 
-## Installation
+## Quickstart (using `uv`)
 
-> This project uses [uv](https://github.com/astral-sh/uv) for Python dependency management.
-
-```sh
+```bash
+# Create and activate a virtualenv
 uv venv
+source .venv/bin/activate  # (On Windows: .venv\Scripts\activate)
+
+# Install in editable mode
 uv pip install -e .
+
+# Optional: clipboard support
+uv pip install '.[clipboard]'
+
+# Run
+curl-to-kodi \  "curl 'https://example.com/video.mp4' -H 'User-Agent: UA' -H 'Referer: https://ref.example'" \  --yt-dlp --title "My Stream"
 ```
 
-## Usage
+## CLI
 
-### Basic: Convert curl to Kodi .strm
-
-```sh
-curl-to-kodi "curl 'https://example.com/video.mp4' -H 'Authorization: Bearer TOKEN'" --title "My Stream"
+```
+usage: curl-to-kodi [-h] [-t TITLE] [-o OUTPUT] [--yt-dlp] [--all-headers]
+                    [--dry-run] [--script-format {sh,bat,ps1}]
+                    [curl_command]
 ```
 
-Creates `My Stream.strm`.
+- `curl_command`: If omitted, reads from clipboard (requires `pyperclip`).  
+- `-t/--title`: Stream title used as base output name.  
+- `-o/--output`: Base output name (ignored if `--title` given).  
+- `--yt-dlp`: Emit a script with a `yt-dlp` command and print it to the console.  
+- `--all-headers`: Include every header from the curl command (bypasses whitelist).  
+- `--dry-run`: Show outputs without writing files.  
+- `--script-format`: `sh` (default on Unix), `bat` (default on Windows), or `ps1`.
 
-### Use clipboard as input
+## Examples
 
-Copy your curl command, then run:
+```bash
+# Read from clipboard and create .strm
+curl-to-kodi
 
-```sh
-curl-to-kodi --title "Copied Stream"
+# Provide curl inline, include all headers, no file writes
+curl-to-kodi "curl https://example/file.mp4 -H 'X-Foo: bar'" --all-headers --dry-run
+
+# Force PowerShell script output
+curl-to-kodi "curl https://example/file.mp4" --yt-dlp --script-format ps1
 ```
 
-### Specify custom output name
+## Development
 
-```sh
-curl-to-kodi "curl ... " -o custom_name
-```
-
-Creates `custom_name.strm`.
-
-### Generate yt-dlp shell script
-
-```sh
-curl-to-kodi "curl ... " --yt-dlp --title "My Stream"
-```
-
-Creates both `My Stream.strm` and `My Stream.sh` (the shell script contains the yt-dlp command).
-
-### Example yt-dlp command
-
-The generated shell script will look like:
-
-```sh
-#!/bin/sh
-yt-dlp --add-header "Authorization: Bearer TOKEN" "https://example.com/video.mp4" -o "My Stream.%(ext)s"
-```
-
-## Testing
-
-Tests are in the `tests/` directory and use `pytest`.
-
-Run tests with:
-
-```sh
+```bash
+# Install dev tools
+uv pip install -e .
 uv pip install pytest
+
+# Run tests
 pytest
 ```
-
-## License
-
-MIT
